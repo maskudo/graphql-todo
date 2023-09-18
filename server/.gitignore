@@ -1,3 +1,4 @@
 postgres-docker/
 venv/
 .env
+__pycache__
