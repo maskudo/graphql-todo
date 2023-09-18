@@ -14,7 +14,7 @@ type_defs = gql("""
         text: String!
         created_by: Int!
         is_done: Boolean!
-        created_at: String;
+        created_at: String!
     }
 
     input AddUserInput {
