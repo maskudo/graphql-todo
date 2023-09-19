@@ -1,6 +1,6 @@
 from models import User, Todo, Base
 from sqlalchemy.orm import sessionmaker
-from ariadne import ObjectType, QueryType, make_executable_schema
+from ariadne import ObjectType, QueryType, ScalarType, make_executable_schema
 from ariadne.asgi import GraphQL
 from starlette.applications import Starlette
 from schema import type_defs
@@ -14,6 +14,13 @@ session = Session()
 
 query = QueryType()
 mutate = ObjectType("Mutation")
+user = ObjectType("User")
+todo = ObjectType("Todo")
+datetime_scalar  = ScalarType('Datetime')
+
+@datetime_scalar.serializer
+def serialize_datetime(value):
+    return value.isoformat()
 
 @query.field("users")
 def resolve_users(*_):
@@ -24,6 +31,23 @@ def resolve_users(*_):
 def resolve_todos(*_):
     todos = session.query(Todo)
     return todos
+
+@query.field("todo")
+def resolve_todo(*_, todoId): 
+    todo = session.query(Todo).where(Todo.id == todoId).one()
+    return todo
+
+@todo.field("created_by")
+def resolve_todo_user(root, *_):
+    userId = root.created_by
+    user = session.query(User).where(User.id == userId).one()
+    return user
+
+
+@query.field("user")
+def resolve_user(*_, userId): 
+    user = session.query(User).where(User.id == userId).one()
+    return user
 
 @mutate.field("addTodo")
 def resolve_add_todo(*_, todo):
@@ -39,7 +63,8 @@ def resolve_add_user(*_, user):
     session.commit()
     return userObj
 
-schema = make_executable_schema(type_defs, query, mutate)
+
+schema = make_executable_schema(type_defs, query, mutate, todo, user, datetime_scalar)
 app = Starlette(debug=True)
 app.mount("/graphql/", GraphQL(schema, debug=True))
 

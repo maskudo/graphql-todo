@@ -6,15 +6,15 @@ type_defs = gql("""
         name: String!
         email: String!
         password: String!
-        created_at: String!
+        created_at: Datetime!
     }
 
     type Todo {
         id: Int!
         text: String!
-        created_by: Int!
         is_done: Boolean!
-        created_at: String!
+        created_at: Datetime!
+        created_by: User!
     }
 
     input AddUserInput {
@@ -47,5 +47,6 @@ type_defs = gql("""
         todo(todoId: Int!): Todo
         user(userId: Int!): User
     }
-    
+
+    scalar Datetime
 """)
