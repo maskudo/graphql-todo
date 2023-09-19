@@ -1,7 +1,8 @@
 from datetime import datetime
-import hashlib
 from sqlalchemy import Boolean, Column, ForeignKey, Integer, String, Date 
-from sqlalchemy.orm import declarative_base, relationship 
+from sqlalchemy.orm import declarative_base, relationship
+
+from utils import hash_password 
 Base = declarative_base()
 
 class User(Base):
@@ -11,17 +12,16 @@ class User(Base):
     name= Column(String(255), nullable=False)
     password= Column(String, nullable=False)
     created_at = Column(Date , default=datetime.now)
-    todos = relationship("Todo", cascade="delete, merge, save-update")
+    todos = relationship("Todo",back_populates="owner", cascade="delete, merge, save-update")
 
     def __init__(self, name:str,  email:str, password:str) -> None:
         self.name = name
         self.email = email
-        hash = hashlib.sha256()
-        hash.update(password.encode('UTF-8'))
-        self.password = hash.digest()
+        self.password = hash_password(password)
 
     def __repr__(self) -> str:
         return f"User(name='{self.name}'), created_at='{self.created_at}', email='{self.email}')"
+
 
 class Todo(Base):
     __tablename__ = 'todos'
@@ -30,6 +30,7 @@ class Todo(Base):
     created_by  = Column(Integer, ForeignKey('users.id'), nullable=False)
     created_at = Column(Date , default=datetime.now)
     is_done  = Column(Boolean, default=False)
+    owner = relationship("User", back_populates="todos")
 
     def __init__(self, text:str,  created_by: Column[int], is_done:bool) -> None:
         self.is_done = is_done

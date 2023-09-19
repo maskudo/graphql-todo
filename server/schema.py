@@ -1,6 +1,8 @@
 from ariadne import gql 
 
 type_defs = gql("""
+    scalar Datetime
+
     type User {
         id: Int!
         name: String!
@@ -16,6 +18,7 @@ type_defs = gql("""
         is_done: Boolean!
         created_at: Datetime!
         created_by: User!
+        owner: User!
     }
 
     input AddUserInput {
@@ -28,12 +31,27 @@ type_defs = gql("""
         created_by: Int!
         is_done: Boolean!
     }
+
+    input UpdateUserInput {
+        id: Int!
+        name: String
+        email: String
+        password: String
+    }
+
+    input UpdateTodoInput {
+        id: Int!
+        text: String
+        is_done: Boolean
+    }
     
     type Mutation {
         addUser(user: AddUserInput!): User!
         deleteUser(userId: Int!): Boolean
+        updateUser(user: UpdateUserInput!): User!
         addTodo(todo: AddTodoInput!): Todo!
         deleteTodo(todoId: Int!): Boolean
+        updateTodo(todo: UpdateTodoInput!): Todo!
     }
 
     type Query {
@@ -42,6 +60,4 @@ type_defs = gql("""
         todo(todoId: Int!): Todo
         user(userId: Int!): User
     }
-
-    scalar Datetime
 """)

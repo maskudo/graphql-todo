@@ -5,7 +5,9 @@ from ariadne.asgi import GraphQL
 from starlette.applications import Starlette
 from schema import type_defs
 
-from sqlalchemy import create_engine 
+from sqlalchemy import create_engine
+
+from utils import hash_password 
 DATABASE_URI='postgresql://postgres:test1234@localhost:5432/todos'
 engine = create_engine(DATABASE_URI)
 Base.metadata.create_all(engine)
@@ -66,6 +68,22 @@ def resolve_delete_todo(*_, todoId):
     except: 
         return False
 
+@mutate.field("updateTodo")
+def resolve_update_todo(*_, todo):
+    current_todo_query = session.query(Todo).where(Todo.id==todo["id"])
+    current_todo = current_todo_query.one()
+    if(todo.get("is_done") is not None):
+        current_todo.is_done = todo.get("is_done")
+    current_todo_query.update({
+        Todo.text: (todo.get("text") or current_todo.text),
+        Todo.is_done:(current_todo.is_done),
+    })
+    session.flush()
+    updated_todo = session.query(Todo).where(Todo.id == todo["id"]).one()
+    print(current_todo)
+    session.commit()
+    return updated_todo
+
 @mutate.field("deleteUser")
 def resolve_delete_User(*_, userId):
     try: 
@@ -82,6 +100,20 @@ def resolve_add_user(*_, user):
     session.add(userObj)
     session.commit()
     return userObj
+
+@mutate.field("updateUser")
+def resolve_update_user(*_, user):
+    current_user_query = session.query(User).where(User.id==user["id"])
+    current_user = current_user_query.one()
+    current_user_query.update({
+        User.name: (user.get("name") or current_user.name),
+        User.password:(hash_password(user.get("password")) or current_user.password),
+        User.email:(user.get("email") or current_user.email),
+    })
+    session.flush()
+    updated_user = session.query(User).where(User.id == user["id"]).one()
+    session.commit()
+    return updated_user
 
 
 schema = make_executable_schema(type_defs, query, mutate, todo, user, datetime_scalar)
