@@ -56,6 +56,26 @@ def resolve_add_todo(*_, todo):
     session.commit()
     return todoObj
 
+@mutate.field("deleteTodo")
+def resolve_delete_todo(*_, todoId):
+    try: 
+        todo = session.query(Todo).where(Todo.id == todoId).one()
+        session.delete(todo)
+        session.commit()
+        return True
+    except: 
+        return False
+
+@mutate.field("deleteUser")
+def resolve_delete_User(*_, userId):
+    try: 
+        user = session.query(User).where(User.id == userId).one()
+        session.delete(user)
+        session.commit()
+        return True
+    except: 
+        return False
+
 @mutate.field("addUser")
 def resolve_add_user(*_, user):
     userObj = User(user['name'], user['email'], user['password'])

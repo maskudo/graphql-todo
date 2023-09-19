@@ -22,23 +22,17 @@ type_defs = gql("""
         email: String!
         password: String!
     }
-    input DeleteUserInput {
-        id: Int!
-    }
     input AddTodoInput {
         text: String!
         created_by: Int!
         is_done: Boolean!
     }
-    input DeleteTodoInput {
-        id: Int!
-    }
     
     type Mutation {
-        addUser(user: AddUserInput): User!
-        deleteUser(user: AddUserInput): User!
-        addTodo(todo: AddTodoInput): Todo!
-        deleteTodo(todo: AddUserInput): Todo!
+        addUser(user: AddUserInput!): User!
+        deleteUser(userId: Int!): Boolean
+        addTodo(todo: AddTodoInput!): Todo!
+        deleteTodo(todoId: Int!): Boolean
     }
 
     type Query {

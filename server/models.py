@@ -27,7 +27,7 @@ class Todo(Base):
     id = Column(Integer, primary_key=True)
     text  = Column(String, nullable=False)
     created_by  = Column(Integer, ForeignKey('users.id'), nullable=False)
-    created_at = Column(Date , default=datetime.isoformat)
+    created_at = Column(Date , default=datetime.now)
     is_done  = Column(Boolean, default=False)
 
     def __init__(self, text:str,  created_by: Column[int], is_done:bool) -> None:
