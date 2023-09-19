@@ -7,6 +7,7 @@ type_defs = gql("""
         email: String!
         password: String!
         created_at: Datetime!
+        todos: [Todo]
     }
 
     type Todo {

@@ -1,7 +1,7 @@
 from datetime import datetime
 import hashlib
 from sqlalchemy import Boolean, Column, ForeignKey, Integer, String, Date 
-from sqlalchemy.orm import declarative_base 
+from sqlalchemy.orm import declarative_base, relationship 
 Base = declarative_base()
 
 class User(Base):
@@ -11,6 +11,7 @@ class User(Base):
     name= Column(String(255), nullable=False)
     password= Column(String, nullable=False)
     created_at = Column(Date , default=datetime.now)
+    todos = relationship("Todo", cascade="delete, merge, save-update")
 
     def __init__(self, name:str,  email:str, password:str) -> None:
         self.name = name

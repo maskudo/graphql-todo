@@ -73,7 +73,7 @@ def resolve_delete_User(*_, userId):
         session.delete(user)
         session.commit()
         return True
-    except: 
+    except:
         return False
 
 @mutate.field("addUser")
