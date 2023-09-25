@@ -1,19 +1,7 @@
-import { useQuery, gql } from '@apollo/client';
+import { useQuery } from '@apollo/client';
 import Form from './Components/Form';
 import Todo from './Components/Todo';
-export const GET_TODOS_BY_USER = gql`
-  query gettingTodoByUser($userId: Int!) {
-    getTodosByUser(userId: $userId) {
-      id
-      text
-      is_done
-      created_by {
-        id
-        name
-      }
-    }
-  }
-`;
+import { GET_TODOS_BY_USER } from './Queries';
 
 function App() {
   const { loading, error, data } = useQuery(GET_TODOS_BY_USER, {
@@ -29,7 +17,7 @@ function App() {
     <>
       <Form />
       {data?.getTodosByUser?.map((todo) => (
-        <Todo todo={todo} />
+        <Todo key={todo.id} todo={todo} />
       ))}
     </>
   );

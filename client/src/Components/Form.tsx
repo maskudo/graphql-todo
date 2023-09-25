@@ -1,28 +1,38 @@
-import { useQuery, gql, useMutation } from '@apollo/client';
+import { gql, useMutation } from '@apollo/client';
 import { FormEvent, useState } from 'react';
-import { GET_TODOS_BY_USER } from '../App';
-const ADD_TODO = gql`
-  mutation addingTodo($todo: AddTodoInput!) {
-    addTodo(todo: $todo) {
-      text
-      id
-      created_by {
-        id
-        name
-      }
-      is_done
-    }
-  }
-`;
+import { ADD_TODO } from '../Mutations';
 export default function Form() {
   const [text, setText] = useState('');
   const [isDone, setIsDone] = useState(false);
-  const [addTodo, { loading, error, data }] = useMutation(ADD_TODO, {
-    refetchQueries: [GET_TODOS_BY_USER, 'getTodosByUser'],
+  const [addTodo, { loading }] = useMutation(ADD_TODO, {
+    // refetchQueries: [GET_TODOS_BY_USER, 'getTodosByUser'],
+    update(cache, { data: { addTodo } }) {
+      cache.modify({
+        fields: {
+          getTodosByUser(existingTodos = []) {
+            const newTodoRef = cache.writeFragment({
+              data: addTodo,
+              fragment: gql`
+                fragment NewTodo on Todo {
+                  id
+                  text
+                  created_by {
+                    id
+                    name
+                  }
+                  is_done
+                }
+              `,
+            });
+            return [...existingTodos, newTodoRef];
+          },
+        },
+      });
+    },
   });
-  const handleSubmit = (e: FormEvent) => {
+  const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
-    addTodo({
+    await addTodo({
       variables: {
         todo: {
           text,

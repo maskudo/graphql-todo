@@ -17,7 +17,7 @@ export default function Todo({
   return (
     <div>
       {todo.text}
-      <input type="checkbox" checked={todo.is_done} />
+      <input type="checkbox" checked={todo.is_done} onChange={() => {}} />
       <button onClick={handleDelete}>Delete</button>
     </div>
   );
