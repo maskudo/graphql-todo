@@ -1,9 +1,8 @@
 import { gql, useMutation } from '@apollo/client';
 import { FormEvent, useState } from 'react';
-import { ADD_TODO } from '../Mutations';
+import { ADD_TODO } from '../graphql/Mutations';
 export default function Form() {
   const [text, setText] = useState('');
-  const [isDone, setIsDone] = useState(false);
   const [addTodo, { loading }] = useMutation(ADD_TODO, {
     // refetchQueries: [GET_TODOS_BY_USER, 'getTodosByUser'],
     update(cache, { data: { addTodo } }) {
@@ -36,7 +35,7 @@ export default function Form() {
       variables: {
         todo: {
           text,
-          is_done: isDone,
+          is_done: false,
           created_by: 5,
         },
       },
@@ -50,12 +49,6 @@ export default function Form() {
         required
         value={text}
         onChange={(e) => setText(e.target.value)}
-      />
-      <input
-        type="checkbox"
-        name="is_done"
-        checked={isDone}
-        onChange={(e) => setIsDone(e.target.checked)}
       />
       <input
         type="submit"

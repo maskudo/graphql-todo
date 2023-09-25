@@ -1,7 +1,7 @@
 import { useQuery } from '@apollo/client';
 import Form from './Components/Form';
 import Todo from './Components/Todo';
-import { GET_TODOS_BY_USER } from './Queries';
+import { GET_TODOS_BY_USER } from './graphql/Queries';
 
 function App() {
   const { loading, error, data } = useQuery(GET_TODOS_BY_USER, {
@@ -12,7 +12,6 @@ function App() {
 
   if (loading) return <div> Loading... </div>;
   if (error) return <div> Error...{error.message} </div>;
-  console.log({ todos: data?.getTodosByUser });
   return (
     <>
       <Form />
