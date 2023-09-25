@@ -55,9 +55,10 @@ type_defs = gql("""
     }
 
     type Query {
-        todos: [Todo]
-        users: [User]
+        todos: [Todo!]
+        users: [User!]
         todo(todoId: Int!): Todo
+        getTodosByUser(userId: Int!): [Todo!]
         user(userId: Int!): User
     }
 """)

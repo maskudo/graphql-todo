@@ -1,8 +1,10 @@
+from starlette.middleware import Middleware
 from models import User, Todo, Base
 from sqlalchemy.orm import sessionmaker
 from ariadne import ObjectType, QueryType, ScalarType, make_executable_schema
 from ariadne.asgi import GraphQL
 from starlette.applications import Starlette
+from starlette.middleware.cors import CORSMiddleware
 from schema import type_defs
 
 from sqlalchemy import create_engine
@@ -38,6 +40,11 @@ def resolve_todos(*_):
 def resolve_todo(*_, todoId): 
     todo = session.query(Todo).where(Todo.id == todoId).one()
     return todo
+
+@query.field("getTodosByUser")
+def resolve_todo_by_user(*_, userId):
+    todos = session.query(Todo).where(Todo.created_by == userId)
+    return todos
 
 @todo.field("created_by")
 def resolve_todo_user(root, *_):
@@ -117,6 +124,7 @@ def resolve_update_user(*_, user):
 
 
 schema = make_executable_schema(type_defs, query, mutate, todo, user, datetime_scalar)
-app = Starlette(debug=True)
+middleware = [Middleware(CORSMiddleware, allow_origins=['*'], allow_methods=['*'])]
+app = Starlette(debug=True,middleware=middleware)
 app.mount("/graphql/", GraphQL(schema, debug=True))
 
